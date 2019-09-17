@@ -55,3 +55,10 @@ end
 A = [4, 1, 1, 2, 9, 7, 3]
 MergeSort!(A, 1, length(A))
 println(A)
+B = [1 2; 4 6; 2 1]
+#= 
+println(B[1, 3])
+7. problemsolving
+8. Disciplin 
+11. Not really 
+ =#
