@@ -1,6 +1,5 @@
 
 function insertionsort!(A)
-	println("Hello")
     i = 1
     while i <= length(A)
         key = A[i]
