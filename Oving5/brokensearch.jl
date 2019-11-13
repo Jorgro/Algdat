@@ -11,9 +11,11 @@ end
 
 
 
+function brokendnasearch(root, dna, i=1, memo = Dict{Array, Int}())
 
-### Du skal implementere denne funksjonen ###
-function brokendnasearch(root, dna, i=1)
+    if get!(memo, root, 0) != 0
+        return get!(memo, root)
+    end
 
     @fastmath if i > length(dna)
         return root.count
@@ -21,72 +23,18 @@ function brokendnasearch(root, dna, i=1)
 
     @fastmath sum = 0
     @fastmath @inbounds if dna[i] != '?'
-        @fastmath @inbounds if haskey(root.children, dna[i])
-            sum += brokendnasearch(root.children[dna[i]], dna, i += 1)
+        if haskey(root.children, dna[i])
+            sum += brokendnasearch(root.children[dna[i]], dna, i += 1, memo)
         end
     else
-        channel = Channel{Int64}(4)
         i += 1
-        task = @async foreach(j -> put!(channel, brokendnasearch(j, dna, i)), values(root.children))
-        bind(channel, task)
-        for j in channel
-            sum += j
+        for j in values(root.children)
+            sum += brokendnasearch(j, dna, i, memo)
         end
     end
 
     return sum
-
-
 end
-
-#= function brokendnasearch(root, dna)
-
-    main_channel = Channel{Int64}(100)
-
-    task = search(root, dna, main_channel)
-    bind(main_channel, task)
-
-    k = 0
-    for i in main_channel
-        k += i
-    end
-
-
-    return k
-
-
-end
-
-function search(root, dna, main_channel, i=1)
-    println(dna)
-    @fastmath if i > length(dna)
-        put!(main_channel, root.count)
-        return
-    end
-
-    channel = Channel{Int64}(100)
-    @fastmath @inbounds if dna[i] != '?'
-        @fastmath @inbounds if haskey(root.children, dna[i])
-            j = i + 1
-            task = @async search(root.children[dna[i]], dna, channel, j)
-            bind(channel, task)
-        end
-    else
-        i += 1
-        task = @async foreach(j -> search(j, dna, channel, i), values(root.children))
-        bind(channel, task)
-    end
-
-    k = 0
-    for i in channel
-        k += i
-    end
-    put!(main_channel, k)
-end
- =#
-
-
-
 
 ### Konstruert testdata, la stå ###
 root1 = Node(Dict('A' => Node(Dict{Char,Node}(), 1)), 0)
